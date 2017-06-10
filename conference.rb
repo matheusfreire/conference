@@ -10,6 +10,8 @@ begin
         end
     end
 
+    talks.sort!{ |t1, t2| t2.duration <=> t1.duration }
+
     i = 1;
     newTrack = true;
     begin
@@ -17,20 +19,29 @@ begin
             track = Track.new("Track "+i.to_s)
             newTrack = false
         end
-        talks.each_with_index do |talk,index|
-            if track.minutes_remaining > 0 && talk.duration > track.minutes_remaining
-                talk = talks[index..-1].find{|t| t.duration == track.minutes_remaining}
+        talks.each do |talk|
+            if talk.duration <= track.minutes_remaining
+                track.add_talk(talk);
             end
-            track.add_talk(talk);
             if track.full?
                 i += 1
                 newTrack = true
+                talks.delete_if{|t| t.inside}
+                track.info
+                break
+            elsif talks.last.duration == talk.duration
+                track.talks << Talk.new(talk.title,'lightning', track.actual_time)
+                talk.inside = true
+                track.minutes_remaining = 0
+                track.actual_time = track.end_time
+                track.talks << Talk.new("Networking Event", 0, track.actual_time)
+                talks.delete_if{|t| t.inside}
+                track.info
                 break
             end
         end
     end while talks.any?
 
-    pp track
 rescue Exception => ex
     puts ex.message
     puts 'An error has been discover, please, verify your file.'

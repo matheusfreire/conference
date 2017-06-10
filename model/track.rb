@@ -23,23 +23,38 @@ class Track
       new_datetime = set_new_date_after_add(new_time,new_time.hour, new_time.strftime("%M"))
       if new_datetime <= lunch_time
         add_new_talk(talk)
+        if new_datetime == lunch_time
+          create_lunch
+        end
       elsif new_datetime > lunch_time && new_datetime < afternoon_begin
-        self.actual_time = lunch_time
-        talks << Talk.new("Lunch", 60,self.actual_time)
-        self.actual_time = afternoon_begin
-        self.minutes_remaining = 240
+        create_lunch
         add_new_talk(talk)
-      elsif new_datetime <= end_time
+      elsif new_datetime < end_time
         add_new_talk(talk)
-      else new_datetime > end_time
+      else new_datetime >= end_time
+        add_new_talk(talk)
         self.actual_time = end_time
         talks << Talk.new("Networking Event", 0, self.actual_time)
       end
     end
   end
 
+  def create_lunch
+    self.actual_time = lunch_time
+    talks << Talk.new("Lunch", 60, self.actual_time)
+    self.actual_time = afternoon_begin
+    self.minutes_remaining = 240
+  end
+
   def full?
     talks.last.title == "Networking Event" if talks.any?
+  end
+
+  def info
+    puts "===== #{name} ===="
+    talks.each do |t|
+      puts "#{t.time_event.strftime("%I:%M%p")} #{t.title} #{t.duration if t.title != "Lunch" && t.title != "Networking Event"} "
+    end
   end
 
 
