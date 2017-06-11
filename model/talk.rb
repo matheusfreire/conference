@@ -27,6 +27,10 @@ class Talk
     }
   end
 
+  def info
+    "#{time_event.strftime("%I:%M%p")} #{title} #{duration if title != "Lunch" && title != "Networking Event"} "
+  end
+
   private
     def set_name(talk)
       index = talk.index(/[0-9]+/) || talk.index('lightning')

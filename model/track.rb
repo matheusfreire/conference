@@ -53,7 +53,7 @@ class Track
   def info
     puts "===== #{name} ===="
     talks.each do |t|
-      puts "#{t.time_event.strftime("%I:%M%p")} #{t.title} #{t.duration if t.title != "Lunch" && t.title != "Networking Event"} "
+      puts t.info
     end
   end
 
